@@ -19,7 +19,7 @@ def JSONTemplate_RecursiveFunc(template, replacements):
         k_type = type(template[k])
         if k_type in [str]: continue
         if k_type in [dict]: template[k] = JSONTemplate_RecursiveFunc(template[k], replacements)
-        elif k_type in [int]: template[k] = replacements[template[k]-1]
+        elif k_type in [int]: template[k] = replacements[template[k]]
 
     return template
 
