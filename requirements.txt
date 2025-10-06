@@ -1,3 +1,4 @@
 streamlit
 
+tqdm
 streamlit_code_editor
