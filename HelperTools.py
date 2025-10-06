@@ -3,12 +3,17 @@ Helper Tools
 """
 
 # Imports
+from ToolApps.CommandHelper import app as APP_CommandHelper
 from ToolApps.LinkMiner import app as APP_ToolMiner
 from ToolApps.SiteHelper import app as APP_SiteHelper
 from ToolApps.TranslationHelper import app as APP_TranslationHelper
 
 # Main Vars
 TOOL_APPS = {
+    "CommandHelper": {
+        "module": APP_CommandHelper,
+        "func": APP_CommandHelper.app_main
+    },
     "LinkMiner": {
         "module": APP_ToolMiner,
         "func": APP_ToolMiner.app_main
