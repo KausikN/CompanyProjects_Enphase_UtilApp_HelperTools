@@ -228,7 +228,9 @@ COMMANDS_DATA = {
                 "output": {
                     "compute": "constant",
                     "value": Utils_JoinLines([
-                        "Info::AppInfo.create(type: \"{flag_name}\", value: \"{flag_value}\")"
+                        "info = Info::AppInfo.find_or_initialize_by(type: \"{flag_name}\")",
+                        "info.value = \"{flag_value}\"",
+                        "info.save"
                     ]),
                     "type": "code",
                     "params": {
