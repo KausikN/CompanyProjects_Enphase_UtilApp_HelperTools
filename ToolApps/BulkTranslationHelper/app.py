@@ -3,14 +3,10 @@ Streamlit GUI for Bulk Translation Helper
 """
 
 # Imports
-import yaml
-import json
 import shutil
 import streamlit as st
 from code_editor import code_editor
 from .BulkTranslationHelper import *
-
-import pandas as pd
 
 # Main Vars
 PATHS = {
@@ -18,22 +14,18 @@ PATHS = {
         "input": {
             "dir": "Data/BulkTranslationHelper/Data/Temp/input/",
             "single": {
-                "dir": "Data/BulkTranslationHelper/Data/Temp/input/",
                 "name": "input"
             },
             "multiple": {
-                "dir": "Data/BulkTranslationHelper/Data/Temp/input/",
                 "prefix": "input_"
             }
         },
         "output": {
             "dir": "Data/BulkTranslationHelper/Data/Temp/output/",
             "single": {
-                "dir": "Data/BulkTranslationHelper/Data/Temp/output/",
                 "name": "output"
             },
             "multiple": {
-                "dir": "Data/BulkTranslationHelper/Data/Temp/output/",
                 "prefix": "output_"
             }
         }
@@ -49,10 +41,13 @@ def Utils_GeneratePathParams(COUNT_TYPE, PATHS_DATA, OPERATION_EXT):
     PATH_PARAMS = {}
 
     if MULTIPLE_FILES:
-        PATH_PARAMS = dict(PATHS_DATA["multiple"])
+        PATH_PARAMS = {
+            "dir": PATHS_DATA["dir"],
+            "prefix": PATHS_DATA["multiple"]["prefix"]
+        }
     else:
         PATH_PARAMS = {
-            "path": os.path.join(PATHS_DATA["single"]["dir"], f"{PATHS_DATA['single']['name']}.{OPERATION_EXT}")
+            "path": os.path.join(PATHS_DATA["dir"], f"{PATHS_DATA['single']['name']}.{OPERATION_EXT}")
         }
 
     return PATH_PARAMS
@@ -114,12 +109,14 @@ def UI_Input(INPUT_PARAMS, SAVE_PARAMS):
         for i in range(len(FILES)):
             FILE = FILES[i]
             if FILE is not None:
-                SAVE_PATH = os.path.join(SAVE_PARAMS["multiple"]["dir"], f"{SAVE_PARAMS['multiple']['prefix']}{i}.{INPUT_TYPE}")
+                os.makedirs(SAVE_PARAMS["dir"], exist_ok=True)
+                SAVE_PATH = os.path.join(SAVE_PARAMS["dir"], f"{SAVE_PARAMS['multiple']['prefix']}{i}.{INPUT_TYPE}")
                 with open(SAVE_PATH, "wb") as f: f.write(FILE.getbuffer())
     else:
         FILE = FILES
         if FILE is not None:
-            SAVE_PATH = os.path.join(SAVE_PARAMS["single"]["dir"], f"{SAVE_PARAMS['single']['name']}.{INPUT_TYPE}")
+            os.makedirs(SAVE_PARAMS["dir"], exist_ok=True)
+            SAVE_PATH = os.path.join(SAVE_PARAMS["dir"], f"{SAVE_PARAMS['single']['name']}.{INPUT_TYPE}")
             with open(SAVE_PATH, "wb") as f: f.write(FILE.getbuffer())
 
 def UI_RunOperation(OPERATION):
@@ -131,6 +128,8 @@ def UI_RunOperation(OPERATION):
     OUTPUT_PARAMS = OPERATION["output"]
     OPERATION_FROM = MODULE.OPERATION_FROM
     OPERATION_TO = MODULE.OPERATION_TO
+
+    os.makedirs(PATHS["save_params"]["output"]["dir"], exist_ok=True)
 
     PATH_PARAMS = {
         "input": Utils_GeneratePathParams(INPUT_PARAMS["count_type"], PATHS["save_params"]["input"], OPERATION_FROM),
@@ -175,7 +174,7 @@ def UI_DisplayAllOutputFiles(DIR_PATH, IGNORE_FILE_PREFIXES=[]):
                     use_container_width=True
                 )
 
-def UI_CommonProcess(OPERATION):
+def UI_CommonProcess(OPERATION, OPERATION_KEY=""):
     '''
     UI - Common Process
     '''
@@ -185,7 +184,7 @@ def UI_CommonProcess(OPERATION):
 
     UI_Input(INPUT_PARAMS, PATHS["save_params"]["input"])
 
-    USERINPUT_Process = st.checkbox("Process")
+    USERINPUT_Process = st.checkbox("Process", key=f"PROCESS_CHECKBOX_{OPERATION_KEY}")
     if not USERINPUT_Process: return
 
     Utils_ClearPrefixedFilesInDir(
@@ -224,7 +223,7 @@ def app_main():
     )
 
     # Process
-    UI_CommonProcess(OPERATIONS[USERINPUT_OperationType][USERINPUT_Operation])
+    UI_CommonProcess(OPERATIONS[USERINPUT_OperationType][USERINPUT_Operation], f"{USERINPUT_OperationType}_{USERINPUT_Operation}")
 
 # Run Code
 if __name__ == "__main__":
