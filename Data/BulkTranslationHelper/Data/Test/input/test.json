@@ -1,0 +1,28 @@
+{
+    "en": {
+        "test": {
+            "com": {
+                "1": "Test EN"
+            },
+            "abc": {
+                "array": [
+                    "Test Array EN 1",
+                    "Test Array EN 2"
+                ]
+            }
+        }
+    },
+    "sv": {
+        "test": {
+            "com": {
+                "1": "Test SV"
+            },
+            "abc": {
+                "array": [
+                    "Test Array SV 1",
+                    "Test Array SV 2"
+                ]
+            }
+        }
+    }
+}

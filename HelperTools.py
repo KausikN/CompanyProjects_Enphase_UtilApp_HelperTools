@@ -7,6 +7,7 @@ from ToolApps.CommandHelper import app as APP_CommandHelper
 from ToolApps.LinkMiner import app as APP_ToolMiner
 from ToolApps.SiteHelper import app as APP_SiteHelper
 from ToolApps.TranslationHelper import app as APP_TranslationHelper
+from ToolApps.BulkTranslationHelper import app as APP_BulkTranslationHelper
 
 # Main Vars
 TOOL_APPS = {
@@ -25,5 +26,9 @@ TOOL_APPS = {
     "TranslationHelper": {
         "module": APP_TranslationHelper,
         "func": APP_TranslationHelper.app_main
+    },
+    "BulkTranslationHelper": {
+        "module": APP_BulkTranslationHelper,
+        "func": APP_BulkTranslationHelper.app_main
     }
 }

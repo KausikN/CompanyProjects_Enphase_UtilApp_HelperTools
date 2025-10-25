@@ -1,5 +1,5 @@
 """
-SiteHelper
+TranslationHelper
 """
 
 # Imports

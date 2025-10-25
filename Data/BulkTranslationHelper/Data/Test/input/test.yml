@@ -1,0 +1,8 @@
+en:
+  test:
+    com:
+      "1": Test EN
+  abc:
+    array:
+      - Test Array EN 1
+      - Test Array EN 2
