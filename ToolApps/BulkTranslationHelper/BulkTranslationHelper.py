@@ -10,6 +10,7 @@ import pandas as pd
 from .TranslationOperations import TMSBulk_Clean_TMSJSON
 from .TranslationOperations import TMSBulk_Join_TMSJSON
 from .TranslationOperations import TMSBulk_Split_TMSJSON
+from .TranslationOperations import TMSBulk_Split_TMSJSON_WithParentKey
 from .TranslationOperations import TMSBulk_Convert_CSV_to_JSON
 from .TranslationOperations import TMSBulk_Convert_CSV_to_Properties
 from .TranslationOperations import TMSBulk_Convert_CSV_to_XLSX
@@ -51,6 +52,17 @@ OPERATIONS = {
     "Split": {
         "tms_json": {
             "module": TMSBulk_Split_TMSJSON,
+            "input": {
+                "type": "json",
+                "count_type": "single"
+            },
+            "output": {
+                "type": "json",
+                "count_type": "multiple"
+            }
+        },
+        "tms_json_with_locale_key": {
+            "module": TMSBulk_Split_TMSJSON_WithParentKey,
             "input": {
                 "type": "json",
                 "count_type": "single"

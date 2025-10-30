@@ -10,6 +10,7 @@ from tqdm import tqdm
 from . import TMSBulk_Clean_TMSJSON
 from . import TMSBulk_Join_TMSJSON
 from . import TMSBulk_Split_TMSJSON
+from . import TMSBulk_Split_TMSJSON_WithParentKey
 from . import TMSBulk_Convert_CSV_to_JSON
 from . import TMSBulk_Convert_CSV_to_Properties
 from . import TMSBulk_Convert_CSV_to_XLSX
