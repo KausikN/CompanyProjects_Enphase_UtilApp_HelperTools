@@ -216,7 +216,7 @@ def UI_CommonProcess(OPERATION, OPERATION_KEY=""):
             CUR_SAVE_PARAMS["output"]["multiple"]["prefix"] = f"{CUR_FILE_NAME_NOEXT}_"
             UI_RunOperation(OPERATION, CUR_SAVE_PARAMS)
     else:
-        CUR_FILE_NAME_NOEXT = os.path.splitext(FILE_NAMES[i])[0]
+        CUR_FILE_NAME_NOEXT = os.path.splitext(FILE_NAMES[0])[0]
         CUR_SAVE_PARAMS = copy.deepcopy(PATHS["save_params"])
         if INPUT_PARAMS["count_type"] == "single":
             CUR_SAVE_PARAMS["output"]["single"]["name"] = CUR_FILE_NAME_NOEXT
