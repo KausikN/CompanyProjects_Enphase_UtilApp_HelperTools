@@ -31,6 +31,7 @@ PATHS = {
         }
     }
 }
+USE_GENERIC_DIR_CLEARING = True
 
 # Utils Functions
 def Utils_GeneratePathParams(COUNT_TYPE, PATHS_DATA, OPERATION_EXT):
@@ -204,10 +205,13 @@ def UI_CommonProcess(OPERATION, OPERATION_KEY=""):
     USERINPUT_Process = st.checkbox("Process", key=f"PROCESS_CHECKBOX_{OPERATION_KEY}")
     if not USERINPUT_Process: return
 
-    Utils_ClearPrefixedFilesInDir(
-        PATHS["save_params"]["output"]["dir"],
-        [PATHS["save_params"]["output"]["multiple"]["prefix"], PATHS["save_params"]["output"]["single"]["name"]]
-    )
+    if USE_GENERIC_DIR_CLEARING:
+        Utils_ClearDir(PATHS["save_params"]["output"]["dir"])
+    else:
+        Utils_ClearPrefixedFilesInDir(
+            PATHS["save_params"]["output"]["dir"],
+            [PATHS["save_params"]["output"]["multiple"]["prefix"], PATHS["save_params"]["output"]["single"]["name"]]
+        )
 
     UI_RunOperation(OPERATION)
 
