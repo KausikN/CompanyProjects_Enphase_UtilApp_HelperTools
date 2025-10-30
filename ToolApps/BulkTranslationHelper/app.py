@@ -91,6 +91,16 @@ def Utils_ClearPrefixedFilesInDir(DIR_PATH, ACCEPT_FILE_PREFIXES=[]):
 
 
 # UI Functions
+def UI_UpdateGlobalPathParams(INPUT_FILE_NAME):
+    '''
+    UI - Update Global Path Params
+    '''
+    global PATHS
+
+    INPUT_FILE_NAME_NOEXT = os.path.splitext(INPUT_FILE_NAME)[0]
+    PATHS["save_params"]["output"]["single"]["name"] = INPUT_FILE_NAME_NOEXT
+    PATHS["save_params"]["output"]["multiple"]["prefix"] = f"{INPUT_FILE_NAME_NOEXT}_"
+
 def UI_Input(INPUT_PARAMS, SAVE_PARAMS):
     '''
     UI - Input
@@ -98,6 +108,8 @@ def UI_Input(INPUT_PARAMS, SAVE_PARAMS):
     INPUT_TYPE = INPUT_PARAMS["type"]
     COUNT_TYPE = INPUT_PARAMS["count_type"]
     MULTIPLE_FILE_INPUT = not (COUNT_TYPE == "single")
+
+    FILE_NAMES = []
 
     FILES = st.file_uploader(
         f"Upload {INPUT_TYPE} {'file' if MULTIPLE_FILE_INPUT else 'files'}",
@@ -112,12 +124,16 @@ def UI_Input(INPUT_PARAMS, SAVE_PARAMS):
                 os.makedirs(SAVE_PARAMS["dir"], exist_ok=True)
                 SAVE_PATH = os.path.join(SAVE_PARAMS["dir"], f"{SAVE_PARAMS['multiple']['prefix']}{i}.{INPUT_TYPE}")
                 with open(SAVE_PATH, "wb") as f: f.write(FILE.getbuffer())
+                FILE_NAMES.append(FILE.name)
     else:
         FILE = FILES
         if FILE is not None:
             os.makedirs(SAVE_PARAMS["dir"], exist_ok=True)
             SAVE_PATH = os.path.join(SAVE_PARAMS["dir"], f"{SAVE_PARAMS['single']['name']}.{INPUT_TYPE}")
             with open(SAVE_PATH, "wb") as f: f.write(FILE.getbuffer())
+            FILE_NAMES.append(FILE.name)
+
+    return FILE_NAMES
 
 def UI_RunOperation(OPERATION):
     '''
@@ -182,7 +198,8 @@ def UI_CommonProcess(OPERATION, OPERATION_KEY=""):
     INPUT_PARAMS = OPERATION["input"]
     OUTPUT_PARAMS = OPERATION["output"]
 
-    UI_Input(INPUT_PARAMS, PATHS["save_params"]["input"])
+    FILE_NAMES = UI_Input(INPUT_PARAMS, PATHS["save_params"]["input"])
+    if (INPUT_PARAMS["count_type"] == "single"): UI_UpdateGlobalPathParams(FILE_NAMES[0])
 
     USERINPUT_Process = st.checkbox("Process", key=f"PROCESS_CHECKBOX_{OPERATION_KEY}")
     if not USERINPUT_Process: return
