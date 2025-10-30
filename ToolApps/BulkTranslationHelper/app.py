@@ -3,9 +3,10 @@ Streamlit GUI for Bulk Translation Helper
 """
 
 # Imports
+import copy
 import shutil
 import streamlit as st
-from code_editor import code_editor
+from stqdm import stqdm
 from .BulkTranslationHelper import *
 
 # Main Vars
@@ -92,28 +93,18 @@ def Utils_ClearPrefixedFilesInDir(DIR_PATH, ACCEPT_FILE_PREFIXES=[]):
 
 
 # UI Functions
-def UI_UpdateGlobalPathParams(INPUT_FILE_NAME):
-    '''
-    UI - Update Global Path Params
-    '''
-    global PATHS
-
-    INPUT_FILE_NAME_NOEXT = os.path.splitext(INPUT_FILE_NAME)[0]
-    PATHS["save_params"]["output"]["single"]["name"] = INPUT_FILE_NAME_NOEXT
-    PATHS["save_params"]["output"]["multiple"]["prefix"] = f"{INPUT_FILE_NAME_NOEXT}_"
-
-def UI_Input(INPUT_PARAMS, SAVE_PARAMS):
+def UI_Input(INPUT_PARAMS, SAVE_PARAMS, BULK_OPERATION=False):
     '''
     UI - Input
     '''
     INPUT_TYPE = INPUT_PARAMS["type"]
     COUNT_TYPE = INPUT_PARAMS["count_type"]
-    MULTIPLE_FILE_INPUT = not (COUNT_TYPE == "single")
+    MULTIPLE_FILE_INPUT = (not (COUNT_TYPE == "single")) or BULK_OPERATION
 
     FILE_NAMES = []
 
     FILES = st.file_uploader(
-        f"Upload {INPUT_TYPE} {'file' if MULTIPLE_FILE_INPUT else 'files'}",
+        f"Upload {INPUT_TYPE} {'files' if MULTIPLE_FILE_INPUT else 'file'}",
         type=[INPUT_TYPE],
         accept_multiple_files=MULTIPLE_FILE_INPUT
     )
@@ -136,7 +127,7 @@ def UI_Input(INPUT_PARAMS, SAVE_PARAMS):
 
     return FILE_NAMES
 
-def UI_RunOperation(OPERATION):
+def UI_RunOperation(OPERATION, OPERATION_SAVE_PARAMS):
     '''
     UI - Run Operation
     '''
@@ -146,11 +137,11 @@ def UI_RunOperation(OPERATION):
     OPERATION_FROM = MODULE.OPERATION_FROM
     OPERATION_TO = MODULE.OPERATION_TO
 
-    os.makedirs(PATHS["save_params"]["output"]["dir"], exist_ok=True)
+    os.makedirs(OPERATION_SAVE_PARAMS["output"]["dir"], exist_ok=True)
 
     PATH_PARAMS = {
-        "input": Utils_GeneratePathParams(INPUT_PARAMS["count_type"], PATHS["save_params"]["input"], OPERATION_FROM),
-        "output": Utils_GeneratePathParams(OUTPUT_PARAMS["count_type"], PATHS["save_params"]["output"], OPERATION_TO)
+        "input": Utils_GeneratePathParams(INPUT_PARAMS["count_type"], OPERATION_SAVE_PARAMS["input"], OPERATION_FROM),
+        "output": Utils_GeneratePathParams(OUTPUT_PARAMS["count_type"], OPERATION_SAVE_PARAMS["output"], OPERATION_TO)
     }
 
     MODULE.PATHS.update(PATH_PARAMS)
@@ -199,11 +190,14 @@ def UI_CommonProcess(OPERATION, OPERATION_KEY=""):
     INPUT_PARAMS = OPERATION["input"]
     OUTPUT_PARAMS = OPERATION["output"]
 
-    FILE_NAMES = UI_Input(INPUT_PARAMS, PATHS["save_params"]["input"])
-    if (len(FILE_NAMES) > 0 and INPUT_PARAMS["count_type"] == "single"): UI_UpdateGlobalPathParams(FILE_NAMES[0])
+    USERINPUT_BulkMode = False
+    if OPERATION["input"]["count_type"] == "single":
+        USERINPUT_BulkMode = st.sidebar.checkbox("Bulk Mode", key=f"BULK_MODE_CHECKBOX_{OPERATION_KEY}")
+
+    FILE_NAMES = UI_Input(INPUT_PARAMS, PATHS["save_params"]["input"], BULK_OPERATION=USERINPUT_BulkMode)
 
     USERINPUT_Process = st.checkbox("Process", key=f"PROCESS_CHECKBOX_{OPERATION_KEY}")
-    if not USERINPUT_Process: return
+    if len(FILE_NAMES) == 0 or not USERINPUT_Process: return
 
     if USE_GENERIC_DIR_CLEARING:
         Utils_ClearDir(PATHS["save_params"]["output"]["dir"])
@@ -213,7 +207,21 @@ def UI_CommonProcess(OPERATION, OPERATION_KEY=""):
             [PATHS["save_params"]["output"]["multiple"]["prefix"], PATHS["save_params"]["output"]["single"]["name"]]
         )
 
-    UI_RunOperation(OPERATION)
+    if USERINPUT_BulkMode:
+        for i in stqdm(range(len(FILE_NAMES)), desc="Processing Files"):
+            CUR_FILE_NAME_NOEXT = os.path.splitext(FILE_NAMES[i])[0]
+            CUR_SAVE_PARAMS = copy.deepcopy(PATHS["save_params"])
+            CUR_SAVE_PARAMS["input"]["single"]["name"] = f"{PATHS['save_params']['input']['multiple']['prefix']}{i}"
+            CUR_SAVE_PARAMS["output"]["single"]["name"] = CUR_FILE_NAME_NOEXT
+            CUR_SAVE_PARAMS["output"]["multiple"]["prefix"] = f"{CUR_FILE_NAME_NOEXT}_"
+            UI_RunOperation(OPERATION, CUR_SAVE_PARAMS)
+    else:
+        CUR_FILE_NAME_NOEXT = os.path.splitext(FILE_NAMES[i])[0]
+        CUR_SAVE_PARAMS = copy.deepcopy(PATHS["save_params"])
+        if INPUT_PARAMS["count_type"] == "single":
+            CUR_SAVE_PARAMS["output"]["single"]["name"] = CUR_FILE_NAME_NOEXT
+            CUR_SAVE_PARAMS["output"]["multiple"]["prefix"] = f"{CUR_FILE_NAME_NOEXT}_"
+        UI_RunOperation(OPERATION, CUR_SAVE_PARAMS)
 
     st.subheader("📂 Output Files")
     UI_DisplayAllOutputFiles(
