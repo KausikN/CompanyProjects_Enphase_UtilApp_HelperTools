@@ -199,7 +199,7 @@ def UI_CommonProcess(OPERATION, OPERATION_KEY=""):
     OUTPUT_PARAMS = OPERATION["output"]
 
     FILE_NAMES = UI_Input(INPUT_PARAMS, PATHS["save_params"]["input"])
-    if (INPUT_PARAMS["count_type"] == "single"): UI_UpdateGlobalPathParams(FILE_NAMES[0])
+    if (len(FILE_NAMES) > 0 and INPUT_PARAMS["count_type"] == "single"): UI_UpdateGlobalPathParams(FILE_NAMES[0])
 
     USERINPUT_Process = st.checkbox("Process", key=f"PROCESS_CHECKBOX_{OPERATION_KEY}")
     if not USERINPUT_Process: return
