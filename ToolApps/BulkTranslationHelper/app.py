@@ -171,25 +171,26 @@ def UI_DisplayAllOutputFiles(DIR_PATH, IGNORE_FILE_PREFIXES=[]):
         VALID_FILES.append(FILE)
     FILES = VALID_FILES
 
-    # Create ZIP in memory
-    zip_buffer = io.BytesIO()
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
-        for FILE in VALID_FILES:
-            file_path = os.path.join(DIR_PATH, FILE)
-            zipf.write(file_path, arcname=FILE)
-    zip_buffer.seek(0)
+    if len(FILES) > 1:
+        # Create ZIP in memory
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+            for FILE in VALID_FILES:
+                file_path = os.path.join(DIR_PATH, FILE)
+                zipf.write(file_path, arcname=FILE)
+        zip_buffer.seek(0)
 
-    # Display ZIP download button
-    st.download_button(
-        label="📦 Download All as ZIP",
-        data=zip_buffer,
-        file_name="output_files.zip",
-        mime="application/zip",
-        use_container_width=True,
-        key="DOWNLOAD_ALL_ZIP"
-    )
+        # Display ZIP download button
+        st.download_button(
+            label="📦 Download All as ZIP",
+            data=zip_buffer,
+            file_name="output_files.zip",
+            mime="application/zip",
+            use_container_width=True,
+            key="DOWNLOAD_ALL_ZIP"
+        )
 
-    st.markdown("---")
+        st.markdown("---")
     
     for FILE in FILES:
         skip = False
