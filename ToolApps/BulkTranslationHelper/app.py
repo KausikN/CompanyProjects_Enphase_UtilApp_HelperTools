@@ -3,8 +3,10 @@ Streamlit GUI for Bulk Translation Helper
 """
 
 # Imports
+import io
 import copy
 import shutil
+import zipfile
 import streamlit as st
 from stqdm import stqdm
 from .BulkTranslationHelper import *
@@ -161,6 +163,34 @@ def UI_DisplayAllOutputFiles(DIR_PATH, IGNORE_FILE_PREFIXES=[]):
         st.info("No Output files generated.")
         return
     
+    # Filter out ignored files
+    VALID_FILES = []
+    for FILE in FILES:
+        if any(FILE.startswith(prefix) for prefix in IGNORE_FILE_PREFIXES):
+            continue
+        VALID_FILES.append(FILE)
+    FILES = VALID_FILES
+
+    # Create ZIP in memory
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for FILE in VALID_FILES:
+            file_path = os.path.join(DIR_PATH, FILE)
+            zipf.write(file_path, arcname=FILE)
+    zip_buffer.seek(0)
+
+    # Display ZIP download button
+    st.download_button(
+        label="📦 Download All as ZIP",
+        data=zip_buffer,
+        file_name="output_files.zip",
+        mime="application/zip",
+        use_container_width=True,
+        key="DOWNLOAD_ALL_ZIP"
+    )
+
+    st.markdown("---")
+    
     for FILE in FILES:
         skip = False
         for FILE_PREFIX in IGNORE_FILE_PREFIXES:
@@ -179,7 +209,8 @@ def UI_DisplayAllOutputFiles(DIR_PATH, IGNORE_FILE_PREFIXES=[]):
                     data=f,
                     file_name=FILE,
                     mime="application/octet-stream",
-                    use_container_width=True
+                    use_container_width=True,
+                    key=f"DOWNLOAD_BUTTON_{FILE}"
                 )
 
 def UI_CommonProcess(OPERATION, OPERATION_KEY=""):
