@@ -55,9 +55,9 @@ def run():
     print()
     ## Apply Filters
     Print_CSVMetadata(CSV_DATA, header=" --- Original CSV Data ---")
-    CSV_DATA = TMSBulk_Filter_ArrayKeys(CSV_DATA, negative_filter=True)
+    # CSV_DATA = TMSBulk_Filter_ArrayKeys(CSV_DATA, negative_filter=True)
     Print_CSVMetadata(CSV_DATA, header=" --- After Array Key Filter --- ")
-    CSV_DATA = TMSBulk_Filter_PrefixesFilter(CSV_DATA, **PREFIX_FILTER_PARAMS)
+    # CSV_DATA = TMSBulk_Filter_PrefixesFilter(CSV_DATA, **PREFIX_FILTER_PARAMS)
     Print_CSVMetadata(CSV_DATA, header=" --- After Prefixes Filter --- ")
     ## Conversion
     JSON_DATA = TMSBulk_Convert_CSV_to_JSON(CSV_DATA)
