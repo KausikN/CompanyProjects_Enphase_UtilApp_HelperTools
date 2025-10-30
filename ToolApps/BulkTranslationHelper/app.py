@@ -186,8 +186,7 @@ def UI_DisplayAllOutputFiles(DIR_PATH, IGNORE_FILE_PREFIXES=[]):
             data=zip_buffer,
             file_name="output_files.zip",
             mime="application/zip",
-            use_container_width=True,
-            key="DOWNLOAD_ALL_ZIP"
+            use_container_width=True
         )
 
         st.markdown("---")
@@ -210,8 +209,7 @@ def UI_DisplayAllOutputFiles(DIR_PATH, IGNORE_FILE_PREFIXES=[]):
                     data=f,
                     file_name=FILE,
                     mime="application/octet-stream",
-                    use_container_width=True,
-                    key=f"DOWNLOAD_BUTTON_{FILE}"
+                    use_container_width=True
                 )
 
 def UI_CommonProcess(OPERATION, OPERATION_KEY=""):
