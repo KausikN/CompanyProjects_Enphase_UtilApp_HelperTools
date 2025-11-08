@@ -16,7 +16,7 @@ def TMSBulk_Convert_CSV_to_Props(CSV_PATH, PROPS_DIR_PATH, PROPS_PATH_PREFIX="")
     TMS Bulk - Convert CSV data to Properties format
     '''
     # Read CSV File
-    DF = pd.read_csv(CSV_PATH)
+    DF = pd.read_csv(CSV_PATH, keep_default_na=False, na_values=[])
     LOCALES = [c for c in DF.columns if c not in ["key"]]
     
     # Convert to Properties and Save

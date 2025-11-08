@@ -49,7 +49,7 @@ def run():
     # CSV to JSON Conversion
     ## Reading CSV
     print(f"Reading {OPERATION_FROM}: {PATHS['input']['path']}")
-    CSV_DATA = pd.read_csv(PATHS["input"]["path"])
+    CSV_DATA = pd.read_csv(PATHS["input"]["path"], keep_default_na=False, na_values=[])
     print("CSV Sample:")
     print(CSV_DATA.head())
     print()

@@ -31,7 +31,7 @@ def UI_CSV_to_JSON():
     )
     if USERINPUT_File is None: st.stop()
     ## Read CSV
-    data = pd.read_csv(USERINPUT_File)
+    data = pd.read_csv(USERINPUT_File, keep_default_na=False, na_values=[])
     st.write(data)
     TRANSLATIONS_DATA = {
         "languages": data.columns,

@@ -15,7 +15,7 @@ def TMSBulk_Convert_CSV_to_XLSX(CSV_PATH, XLSX_PATH):
     '''
     TMS Bulk - Convert CSV data to XLSX format
     '''
-    DF = pd.read_csv(CSV_PATH)
+    DF = pd.read_csv(CSV_PATH, keep_default_na=False, na_values=[])
     DF.to_excel(XLSX_PATH, index=False)
 
 # Main Vars
